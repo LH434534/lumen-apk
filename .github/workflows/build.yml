@@ -83,8 +83,17 @@ jobs:
           } > build.log 2>&1
           echo "exit=$?"
 
+      - name: subir APK como artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lumen-apk
+          path: build/lumen-signed.apk
+          if-no-files-found: ignore
+
       - name: publicar
         if: always()
+        continue-on-error: true
         run: |
           mkdir -p out
           cp build.log out/build.log 2>/dev/null || echo "sem log" > out/build.log
@@ -94,7 +103,7 @@ jobs:
           git config user.email build@bot.local
           git add -f out
           git diff --cached --quiet || git commit -m "apk $(date -u +%FT%TZ)"
-          git push
+          git push || echo "push falhou (nao impede o artifact)"
 
       - name: falhar se o APK nao existe
         run: |
