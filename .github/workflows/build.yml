@@ -111,15 +111,6 @@ jobs:
           git add -f out
           git diff --cached --quiet || git commit -m "apk $(date -u +%FT%TZ)"
           git push 2>&1 | tail -3 || echo "push sem efeito"
-          mkdir -p out
-          cp build.log out/build.log 2>/dev/null || echo "sem log" > out/build.log
-          cp build/lumen-signed.apk out/lumen.apk 2>/dev/null || true
-          ls -lh out/
-          git config user.name build-bot
-          git config user.email build@bot.local
-          git add -f out
-          git diff --cached --quiet || git commit -m "apk $(date -u +%FT%TZ)"
-          git push || echo "push falhou (nao impede o artifact)"
 
       - name: falhar se o APK nao existe
         run: |
