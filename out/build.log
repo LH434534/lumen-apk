@@ -1,4 +1,4 @@
-===== BUILD 2026-10-06T21:16:24Z =====
+===== BUILD 2026-10-06T21:18:20Z =====
 ANDROID_HOME=/usr/local/lib/android/sdk
 build-tools: /usr/local/lib/android/sdk/build-tools/37.0.0
 platform:    /usr/local/lib/android/sdk/platforms/android-37.2
@@ -15,7 +15,7 @@ classes: 11
 --- 4. d8 ---
 entradas: 11
 total 12
--rw-r--r-- 1 runner runner 11384 Oct  6 21:16 classes.dex
+-rw-r--r-- 1 runner runner 11384 Oct  6 21:18 classes.dex
 --- 5. dex no apk ---
 Archive:  build/stack.apk
   Length      Date    Time    Name
@@ -24,7 +24,7 @@ Archive:  build/stack.apk
       456  1980-01-01 00:00   res/drawable/ic_launcher_bg.xml
      1032  1980-01-01 00:00   resources.arsc
     40031  1980-01-01 00:00   assets/index.html
-    11384  2026-10-06 21:16   classes.dex
+    11384  2026-10-06 21:18   classes.dex
 ---------                     -------
     55543                     5 files
 --- 6. zipalign ---
@@ -35,7 +35,7 @@ alinhado: 21423 bytes
 assinado: 29209 bytes
 --- 8. verificar ---
 V3.0 Signer: certificate DN: CN=Lumen, OU=Dev, O=Thiairo, L=SP, C=BR
-V3.0 Signer: certificate SHA-256 digest: b5f90a19a8a5b3a6bc00b19084fd3032ddda5ac1037089e2e958453227974f2d
-V3.0 Signer: certificate SHA-1 digest: 207a44b1b41fbd93e3ec90196b8c5322cc0ed55c
-V3.0 Signer: certificate MD5 digest: 72c72ca4f62f09ed4deca7fc5691be15
+V3.0 Signer: certificate SHA-256 digest: 5728b0bd1d2b0f72ab7716963f637bcc825a863ef3eefccce5e72ff6ee32481a
+V3.0 Signer: certificate SHA-1 digest: 1078769235e274c27302cffe2aa13f10b0276f1d
+V3.0 Signer: certificate MD5 digest: 917fdec3d606005758373d5a13ef032e
 ===== FIM =====
