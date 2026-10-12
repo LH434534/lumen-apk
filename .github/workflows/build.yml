@@ -13,9 +13,8 @@ jobs:
 
       - name: compilar APK
         id: build
-        continue-on-error: true
         run: |
-          set +e
+          set -euo pipefail
           {
           echo "===== BUILD $(date -u +%FT%TZ) ====="
           export ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
