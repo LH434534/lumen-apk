@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0A0E14">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Lumen</title>
+<style>
+/* ============================================================
+   Lumen — sistema de design
+   Espaco em escala de 4px, tipografia em passos fixos,
+   superficies em camadas por elevacao, movimento curto e util.
+   ============================================================ */
+:root{
+  /* superficies: da mais funda para a mais alta */
+  --s0:#0A0E14;      /* fundo */
+  --s1:#111620;      /* barras */
+  --s2:#171E2A;      /* cards */
+  --s3:#1F2836;      /* elevado / input */
+  --s4:#2A3444;      /* borda ativa */
+
+  --line:#212B3A;    /* divisor sutil */
+  --line-soft:#19212D;
+
+  /* texto */
+  --t1:#EEF2F8;      /* primario */
+  --t2:#A7B2C4;      /* secundario */
+  --t3:#6E7A8D;      /* tenue */
+
+  /* acento: um so, usado com parcimonia */
+  --a1:#6EE7F9;      /* ciano */
+  --a2:#8B7CFF;      /* violeta */
+  --ok:#5BE49B;
+  --warn:#F5C86B;
+  --err:#FF7A7A;
+
+  /* tipografia: escala fixa */
+  --f-xs:11px; --f-sm:12.5px; --f-md:14px; --f-lg:16px; --f-xl:20px; --f-2xl:28px;
+  --lh:1.55;
+
+  /* espaco: multiplos de 4 */
+  --s:4px; --m:8px; --l:14px; --xl:20px; --xxl:28px;
+
+  --r-s:8px; --r-m:12px; --r-l:18px; --r-xl:24px;
+
+  /* movimento: rapido o bastante para nao atrasar */
+  --e:cubic-bezier(.2,.8,.2,1);
+  --d-fast:120ms; --d:200ms; --d-slow:340ms;
+
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+
+@media (prefers-color-scheme: light){
+  :root{
+    --s0:#F7F9FC; --s1:#FFFFFF; --s2:#FFFFFF; --s3:#F0F3F8; --s4:#DDE3EC;
+    --line:#E4E9F1; --line-soft:#EDF1F7;
+    --t1:#0E1420; --t2:#4A5768; --t3:#7A8699;
+    --a1:#0091B8; --a2:#6A54E8; --ok:#129A5B; --warn:#B07A10; --err:#C43636;
+  }
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;overflow:hidden}
+body{
+  background:var(--s0); color:var(--t1);
+  font:var(--f-md)/var(--lh) -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-feature-settings:"kern" 1,"liga" 1;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overscroll-behavior:none;
+}
+
+/* ===================== estrutura ===================== */
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+
+/* barra superior: fundo com blur, nao com sombra */
+header{
+  flex:none; display:flex; align-items:center; gap:var(--m);
+  padding:calc(var(--safe-t) + var(--m)) var(--l) var(--m);
+  background:color-mix(in srgb, var(--s1) 88%, transparent);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--line-soft);
+  z-index:20;
+}
+.mark{
+  width:30px;height:30px;border-radius:9px;flex:none;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  box-shadow:0 2px 10px color-mix(in srgb,var(--a2) 40%, transparent);
+}
+.mark::after{
+  content:"";position:absolute;inset:2px;border-radius:7px;
+  background:var(--s1);
+  /* o brilho gira devagar: vida sem chamar atencao */
+  animation:spin 9s linear infinite;
+  opacity:.55;
+}
+.mark::before{
+  content:"";position:absolute;inset:7px;border-radius:50%;z-index:1;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){ .mark::after{animation:none} }
+
+.brand{font-size:var(--f-lg);font-weight:650;letter-spacing:-.01em;margin:0;line-height:1}
+.brand em{font-style:normal;color:var(--t3);font-weight:450;font-size:var(--f-sm);display:block;margin-top:1px}
+.spacer{flex:1}
+.hbtn{
+  flex:none;height:34px;min-width:34px;padding:0 10px;border-radius:var(--r-m);
+  background:var(--s2);border:1px solid var(--line);color:var(--t2);
+  font-size:var(--f-sm);font-weight:550;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  transition:background var(--d-fast) var(--e), color var(--d-fast) var(--e), transform var(--d-fast) var(--e);
+}
+.hbtn:active{transform:scale(.94)}
+.hbtn.on{background:color-mix(in srgb,var(--a1) 16%,var(--s2));color:var(--a1);border-color:color-mix(in srgb,var(--a1) 30%,var(--line))}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--t3);flex:none;transition:background var(--d) var(--e)}
+.dot.live{background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 18%,transparent)}
+.dot.wait{background:var(--warn);animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* ===================== conversa ===================== */
+main{
+  flex:1; overflow-y:auto; overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:var(--l) var(--l) var(--m);
+  scroll-behavior:smooth;
+}
+
+/* estado vazio: tipografia, nao ilustracao */
+.hero{
+  max-width:340px;margin:0 auto;padding:var(--xxl) var(--m) var(--xl);
+  animation:rise var(--d-slow) var(--e) both;
+}
+.hero h1{
+  font-size:var(--f-2xl);font-weight:600;letter-spacing:-.025em;
+  line-height:1.15;margin:0 0 var(--m);
+  background:linear-gradient(135deg,var(--t1) 30%,var(--a1));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero p{color:var(--t2);font-size:var(--f-md);margin:0 0 var(--l);line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:var(--m)}
+.chip{
+  background:var(--s2);border:1px solid var(--line);border-radius:var(--r-xl);
+  padding:7px 13px;color:var(--t2);font-size:var(--f-sm);cursor:pointer;
+  transition:all var(--d-fast) var(--e);
+}
+.chip:hover{border-color:var(--s4);color:var(--t1);transform:translateY(-1px)}
+.chip:active{transform:scale(.97)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* mensagens */
+.row{display:flex;gap:var(--m);margin-bottom:var(--l);animation:rise var(--d) var(--e) both}
+.row.me{flex-direction:row-reverse}
+.ava{
+  width:26px;height:26px;border-radius:8px;flex:none;margin-top:2px;
+  display:grid;place-items:center;font-size:11px;font-weight:700;
+  background:var(--s3);color:var(--t3);
+}
+.row.me .ava{background:linear-gradient(135deg,var(--a1),var(--a2));color:#05131A}
+.bub{
+  max-width:calc(100% - 42px);
+  padding:var(--m) var(--l);
+  border-radius:var(--r-l);
+  background:var(--s2);border:1px solid var(--line-soft);
+  color:var(--t1);font-size:var(--f-md);
+  position:relative;
+}
+.row.me .bub{
+  background:var(--s3);border-color:var(--line);
+  border-bottom-right-radius:var(--r-s);
+}
+.bub:not(.me){border-bottom-left-radius:var(--r-s)}
+.bub p{margin:0 0 var(--m)}
+.bub p:last-child{margin-bottom:0}
+.bub strong{font-weight:650;color:var(--t1)}
+.bub em{font-style:italic;color:var(--t2)}
+.bub code{
+  font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  background:var(--s0);border:1px solid var(--line-soft);
+  padding:1px 5px;border-radius:5px;color:var(--a1);
+}
+.bub pre{
+  margin:var(--m) 0;background:var(--s0);border:1px solid var(--line-soft);
+  border-radius:var(--r-m);padding:var(--l);overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.bub pre code{background:none;border:0;padding:0;color:var(--t2);font-size:12.5px;line-height:1.6}
+.bub ul,.bub ol{margin:var(--m) 0;padding-left:var(--xl)}
+.bub li{margin:3px 0}
+.bub h3{font-size:var(--f-lg);font-weight:650;margin:var(--l) 0 var(--m)}
+.bub blockquote{
+  margin:var(--m) 0;padding-left:var(--l);border-left:2px solid var(--a2);color:var(--t2);
+}
+.bub a{color:var(--a1);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--a1) 35%,transparent)}
+.bub table{width:100%;border-collapse:collapse;margin:var(--m) 0;font-size:var(--f-sm)}
+.bub th,.bub td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+.bub th{background:var(--s0);font-weight:600}
+
+.meta{
+  font-size:var(--f-xs);color:var(--t3);margin-top:6px;
+  display:flex;gap:var(--m);align-items:center;
+  font-variant-numeric:tabular-nums;
+}
+.act{
+  background:none;border:0;color:var(--t3);font-size:var(--f-xs);cursor:pointer;
+  padding:2px 6px;border-radius:5px;transition:all var(--d-fast) var(--e);
+}
+.act:hover{color:var(--t1);background:var(--s3)}
+
+/* cursor de geracao */
+.caret{
+  display:inline-block;width:2px;height:1em;vertical-align:-2px;margin-left:2px;
+  background:var(--a1);animation:blink 1s step-end infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* indicador pensando */
+.thinking{display:flex;gap:4px;align-items:center;padding:2px 0}
+.thinking i{
+  width:5px;height:5px;border-radius:50%;background:var(--t3);
+  animation:bounce 1.2s ease-in-out infinite;
+}
+.thinking i:nth-child(2){animation-delay:.16s}
+.thinking i:nth-child(3){animation-delay:.32s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-4px);opacity:1}}
+
+/* ===================== compositor ===================== */
+footer{
+  flex:none; padding:var(--m) var(--l) calc(var(--safe-b) + var(--m));
+  background:color-mix(in srgb, var(--s1) 92%, transparent);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-top:1px solid var(--line-soft);
+}
+.composer{
+  display:flex;align-items:flex-end;gap:var(--m);
+  background:var(--s2);border:1px solid var(--line);
+  border-radius:var(--r-l);padding:5px 5px 5px var(--l);
+  transition:border-color var(--d) var(--e), box-shadow var(--d) var(--e);
+}
+.composer:focus-within{
+  border-color:color-mix(in srgb,var(--a1) 45%,var(--line));
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--a1) 10%,transparent);
+}
+#txt{
+  flex:1;background:none;border:0;color:var(--t1);
+  font:inherit;font-size:var(--f-md);line-height:1.5;
+  padding:8px 0;max-height:120px;min-height:22px;resize:none;outline:none;
+}
+#txt::placeholder{color:var(--t3)}
+.send{
+  flex:none;width:34px;height:34px;border-radius:var(--r-m);
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  border:0;color:#04141B;cursor:pointer;
+  display:grid;place-items:center;
+  transition:transform var(--d-fast) var(--e), opacity var(--d-fast) var(--e);
+}
+.send:disabled{opacity:.3;cursor:default}
+.send:not(:disabled):active{transform:scale(.9)}
+.send svg{width:17px;height:17px}
+
+/* ===================== painel lateral ===================== */
+#scrim{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;
+  opacity:0;pointer-events:none;transition:opacity var(--d) var(--e);
+  backdrop-filter:blur(2px);
+}
+#scrim.on{opacity:1;pointer-events:auto}
+#panel{
+  position:fixed;top:0;right:0;bottom:0;width:min(88vw,360px);
+  background:var(--s1);border-left:1px solid var(--line);z-index:50;
+  transform:translateX(100%);transition:transform var(--d-slow) var(--e);
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:-8px 0 40px rgba(0,0,0,.35);
+}
+#panel.on{transform:none}
+.phead{
+  flex:none;padding:calc(var(--safe-t) + var(--l)) var(--l) var(--l);
+  border-bottom:1px solid var(--line-soft);
+}
+.phead h2{margin:0;font-size:var(--f-xl);font-weight:650;letter-spacing:-.02em}
+.phead p{margin:2px 0 0;font-size:var(--f-sm);color:var(--t3)}
+.pbody{flex:1;overflow-y:auto;padding:var(--l)}
+
+.sec{margin-bottom:var(--xxl)}
+.sec>h3{
+  font-size:var(--f-xs);text-transform:uppercase;letter-spacing:.09em;
+  color:var(--t3);font-weight:600;margin:0 0 var(--m);
+}
+.field{margin-bottom:var(--l)}
+.field label{display:block;font-size:var(--f-sm);color:var(--t2);margin-bottom:5px;font-weight:500}
+.field .hint{font-size:var(--f-xs);color:var(--t3);margin-top:4px;line-height:1.45}
+input[type=text],input[type=password],input[type=number],select,textarea{
+  width:100%;background:var(--s0);border:1px solid var(--line);
+  color:var(--t1);border-radius:var(--r-m);padding:9px 11px;
+  font:inherit;font-size:var(--f-md);outline:none;
+  transition:border-color var(--d-fast) var(--e);
+}
+input:focus,select:focus,textarea:focus{border-color:color-mix(in srgb,var(--a1) 50%,var(--line))}
+input[type=range]{width:100%;accent-color:var(--a1);background:none;border:0;padding:0}
+.rowl{display:flex;gap:var(--m)}
+.rowl>*{flex:1;min-width:0}
+.btn{
+  background:var(--s3);border:1px solid var(--line);color:var(--t1);
+  border-radius:var(--r-m);padding:9px 14px;font-size:var(--f-md);font-weight:550;
+  cursor:pointer;width:100%;transition:all var(--d-fast) var(--e);
+}
+.btn:active{transform:scale(.98)}
+.btn.pri{background:linear-gradient(135deg,var(--a1),var(--a2));color:#04141B;border:0;font-weight:650}
+.btn.sm{padding:6px 10px;font-size:var(--f-sm)}
+
+.kv{
+  display:flex;justify-content:space-between;align-items:center;gap:var(--m);
+  padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:var(--f-sm);
+}
+.kv:last-child{border:0}
+.kv b{font-weight:600;font-variant-numeric:tabular-nums;text-align:right;word-break:break-all;max-width:60%}
+.kv .g{color:var(--ok)} .kv .r{color:var(--err)}
+
+.card{background:var(--s2);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--l);margin-bottom:var(--m)}
+.card h4{margin:0 0 var(--m);font-size:var(--f-md);font-weight:600}
+
+.ep{
+  display:flex;align-items:center;gap:var(--m);padding:10px 11px;
+  background:var(--s0);border:1px solid var(--line);border-radius:var(--r-m);
+  margin-bottom:6px;cursor:pointer;transition:all var(--d-fast) var(--e);
+}
+.ep:hover{border-color:var(--s4)}
+.ep.on{border-color:var(--a1);background:color-mix(in srgb,var(--a1) 8%,var(--s0))}
+.ep .nm{flex:1;font-weight:550;font-size:var(--f-md)}
+.ep .st{font-size:var(--f-xs);padding:2px 7px;border-radius:20px;background:var(--s3);color:var(--t3)}
+.ep .st.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.ep .st.no{background:color-mix(in srgb,var(--err) 16%,transparent);color:var(--err)}
+
+.tag{display:inline-block;background:var(--s3);border:1px solid var(--line);color:var(--t2);
+  border-radius:20px;padding:4px 11px;font-size:var(--f-xs);margin:3px 3px 0 0;cursor:pointer}
+.tag.on{background:color-mix(in srgb,var(--a1) 14%,transparent);border-color:var(--a1);color:var(--a1)}
+
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%) translateY(80px);
+  bottom:calc(var(--safe-b) + 76px);
+  background:var(--t1);color:var(--s0);
+  padding:9px 16px;border-radius:var(--r-xl);font-size:var(--f-sm);font-weight:600;
+  z-index:99;opacity:0;transition:all var(--d-slow) var(--e);pointer-events:none;
+  box-shadow:0 6px 24px rgba(0,0,0,.3);max-width:80vw;text-align:center;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* utility */
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:var(--f-sm)}
+.dim{color:var(--t2)} .dimmer{color:var(--t3)}
+.hidden{display:none!important}
+.center{text-align:center}
+
+@media (max-width:360px){
+  :root{--l:12px;--xl:16px}
+  .hero h1{font-size:24px}
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header>
+    <div class="mark"></div>
+    <div>
+      <h1 class="brand">Lumen<em id="sub">conversa</em></h1>
+    </div>
+    <div class="spacer"></div>
+    <div class="dot" id="dot" title="estado"></div>
+    <button class="hbtn" id="bNew" title="nova conversa">nova</button>
+    <button class="hbtn" id="bMenu" title="configurações">config</button>
+  </header>
+
+  <main id="main"></main>
+
+  <footer>
+    <div class="composer">
+      <textarea id="txt" rows="1" placeholder="Escreva algo…"></textarea>
+      <button class="send" id="send" disabled aria-label="enviar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 19V5M5 12l7-7 7 7"/>
+        </svg>
+      </button>
+    </div>
+  </footer>
+</div>
+
+<div id="scrim"></div>
+<aside id="panel">
+  <div class="phead">
+    <h2>Configurações</h2>
+    <p id="psub">tudo fica neste aparelho</p>
+  </div>
+  <div class="pbody" id="pbody"></div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ============================================================================
+   Lumen — cliente de conversa.
+   Sem dependencias. Sem build. Streaming token por token.
+   ========================================================================== */
+const $ = s => document.querySelector(s);
+const LS = "lumen.v1";
+const main = $("#main"), txt = $("#txt");
+
+const state = load();
+function load(){
+  try{
+    return Object.assign({
+      ep:"", kind:"openai", model:"", system:"",
+      convs:[[]], conv:0,
+      p:{temperature:.7, top_p:.9, top_k:40, repeat_penalty:1.1, num_ctx:8192},
+      testes:{}
+    }, JSON.parse(localStorage.getItem(LS)||"{}"));
+  }catch(e){
+    return {ep:"",kind:"openai",model:"",system:"",convs:[[]],conv:0,
+      p:{temperature:.7,top_p:.9,top_k:40,repeat_penalty:1.1,num_ctx:8192},testes:{}};
+  }
+}
+function save(){ try{ localStorage.setItem(LS,JSON.stringify(state)); }catch(e){} }
+const msgs = () => state.convs[state.conv] || (state.convs[state.conv]=[]);
+
+/* ------------------------------------------------------------ util */
+let tt;
+function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("on");
+  clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("on"),1900); }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function fmtTime(d){ return d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); }
+
+/* markdown: o minimo que uma conversa precisa, seguro por construcao */
+function md(src){
+  const blocos=[];
+  let s = esc(src);
+  // code fence primeiro, para nao processar dentro
+  s = s.replace(/```(\w*)\n?([\s\S]*?)```/g, (m,lang,code)=>{
+    blocos.push('<pre><code>'+code.replace(/\n$/,"")+'</code></pre>');
+    return " B"+ (blocos.length-1) +" ";
+  });
+  s = s.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+  s = s.replace(/^###\s+(.+)$/gm, "<h3>$1</h3>");
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+  s = s.replace(/^&gt;\s?(.+)$/gm, "<blockquote>$1</blockquote>");
+  s = s.replace(/^\s*[-*]\s+(.+)$/gm, "<ul><li>$1</li></ul>");
+  s = s.replace(/<\/ul>\n<ul>/g, "");
+  s = s.replace(/^\s*(\d+)\.\s+(.+)$/gm, "<ol><li>$2</li></ol>");
+  s = s.replace(/<\/ol>\n<ol>/g, "");
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  // paragrafos: separa por linha em branco
+  s = s.split(/\n{2,}/).map(p=>{
+    p=p.trim(); if(!p) return "";
+    if(/^<(h3|ul|ol|blockquote|pre)/.test(p)) return p;
+    return "<p>"+p.replace(/\n/g,"<br>")+"</p>";
+  }).join("");
+  s = s.replace(/ B(\d+) /g, (m,i)=>blocos[+i]);
+  return s;
+}
+
+/* ------------------------------------------------------------ render */
+function renderAll(){
+  main.innerHTML="";
+  if(!msgs().length){ hero(); return; }
+  msgs().forEach(m=>append(m, false));
+  rolar();
+}
+function hero(){
+  const n = state.convs.length;
+  const d = document.createElement("div");
+  d.className="hero";
+  d.innerHTML =
+    `<h1>Boa noite.</h1>
+     <p>${state.ep && state.model
+        ? "Conectado. É só escrever."
+        : "Configure um servidor local em <b>config</b> para conversar, ou use as ferramentas que funcionam sem ele."}</p>
+     <div class="chips">
+       <button class="chip" data-q="Explique o que é um buraco negro como se eu tivesse 12 anos">Explique um buraco negro</button>
+       <button class="chip" data-q="Me ajude a revisar um texto com clareza">Revisar um texto</button>
+       <button class="chip" data-q="clima em São Paulo">Clima agora</button>
+       <button class="chip" data-q="Me dê 5 ideias de projetos pequenos em JavaScript">Ideias de projeto</button>
+       <button class="chip" data-q="bitcoin">Preço do bitcoin</button>
+       <button class="chip" data-q="Explique a diferença entre memória RAM e armazenamento">RAM vs disco</button>
+     </div>`;
+  d.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ txt.value=b.dataset.q; sync(); txt.focus(); });
+  main.appendChild(d);
+}
+function append(m, animar=true){
+  const row=document.createElement("div");
+  row.className="row"+(m.role==="user"?" me":"");
+  if(animar) row.style.animation="rise var(--d) var(--e) both";
+
+  const ava=document.createElement("div");
+  ava.className="ava";
+  ava.textContent = m.role==="user" ? "você" : "L";
+  if(m.role==="user") ava.style.fontSize="9px";
+  row.appendChild(ava);
+
+  const body=document.createElement("div");
+  body.style.minWidth="0"; body.style.flex="1";
+
+  const bub=document.createElement("div");
+  bub.className="bub";
+  bub.innerHTML = m.role==="user" ? esc(m.content).replace(/\n/g,"<br>") : md(m.content);
+  body.appendChild(bub);
+
+  if(m.role==="assistant"){
+    const meta=document.createElement("div");
+    meta.className="meta";
+    const copiar=document.createElement("button");
+    copiar.className="act"; copiar.textContent="copiar";
+    copiar.onclick=()=>{
+      navigator.clipboard?.writeText(m.content).then(()=>toast("copiado"),()=>toast("sem permissão"));
+    };
+    meta.appendChild(copiar);
+    if(m.ms){
+      const st=document.createElement("span");
+      st.textContent = m.tok ? `${m.tok} tok · ${(m.ms/1000).toFixed(1)}s · ${(m.tok/(m.ms/1000)).toFixed(1)}/s`
+                             : `${(m.ms/1000).toFixed(1)}s`;
+      meta.appendChild(st);
+    }
+    body.appendChild(meta);
+  }
+  row.appendChild(body);
+  main.appendChild(row);
+  return bub;
+}
+function rolar(){ main.scrollTop = main.scrollHeight; }
+function sync(){
+  const v=txt.value.trim();
+  $("#send").disabled = !v;
+  txt.style.height="auto";
+  txt.style.height=Math.min(txt.scrollHeight,120)+"px";
+}
+
+/* ------------------------------------------------------------ rede */
+async function ping(base, path, ms=3500){
+  const c=new AbortController(); const t=setTimeout(()=>c.abort(), ms);
+  try{
+    const r=await fetch(base+path,{signal:c.signal,headers:{Accept:"application/json"}});
+    return {ok:r.ok, code:r.status};
+  }catch(e){
+    return {ok:false, code:0, err: e.name==="AbortError"?"sem resposta":"bloqueado"};
+  }finally{ clearTimeout(t); }
+}
+async function listarModelos(){
+  try{
+    if(state.kind==="ollama"){
+      const r=await fetch(state.ep+"/api/tags"); if(!r.ok) throw 0;
+      const d=await r.json();
+      return (d.models||[]).map(m=>m.name||m.model).filter(Boolean);
+    }
+    const r=await fetch(state.ep+"/v1/models"); if(!r.ok) throw 0;
+    const d=await r.json();
+    return (d.data||[]).map(m=>m.id).filter(Boolean);
+  }catch(e){ return []; }
+}
+
+// SSE (OpenAI-compat): linhas "data: {json}", termina em "data: [DONE]"
+async function streamOpenAI(url, body, onTok, signal){
+  const r=await fetch(url,{method:"POST",signal,
+    headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(!r.ok){ const t=await r.text().catch(()=>""); throw new Error("HTTP "+r.status+" "+t.slice(0,120)); }
+  if(!r.body) throw new Error("streaming desativado no servidor");
+  const rd=r.body.getReader(), dec=new TextDecoder(); let buf="";
+  while(true){
+    const {done,value}=await rd.read(); if(done) break;
+    buf+=dec.decode(value,{stream:true});
+    const ls=buf.split("\n"); buf=ls.pop();
+    for(const ln of ls){
+      const s=ln.trim();
+      if(!s.startsWith("data:")) continue;
+      const d=s.slice(5).trim();
+      if(d==="[DONE]") return;
+      try{ const j=JSON.parse(d); const c=j.choices?.[0]?.delta?.content; if(c) onTok(c); }catch(e){}
+    }
+  }
+}
+// NDJSON (Ollama): uma linha por objeto, {"message":{"content":"..."},"done":bool}
+async function streamOllama(url, body, onTok, signal){
+  const r=await fetch(url,{method:"POST",signal,
+    headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(!r.ok){ const t=await r.text().catch(()=>""); throw new Error("HTTP "+r.status+" "+t.slice(0,120)); }
+  const rd=r.body.getReader(), dec=new TextDecoder(); let buf="";
+  while(true){
+    const {done,value}=await rd.read(); if(done) break;
+    buf+=dec.decode(value,{stream:true});
+    const ls=buf.split("\n"); buf=ls.pop();
+    for(const ln of ls){
+      if(!ln.trim()) continue;
+      try{
+        const j=JSON.parse(ln);
+        if(j.message && j.message.content) onTok(j.message.content);
+        if(j.done) return;
+      }catch(e){}
+    }
+  }
+}
+
+/* ------------------------------------------------------------ geracao */
+let ctl=null;
+async function enviar(){
+  const q=txt.value.trim(); if(!q) return;
+  txt.value=""; sync();
+  msgs().push({role:"user",content:q,at:Date.now()}); save();
+  if(main.querySelector(".hero")) main.innerHTML="";
+  append(msgs()[msgs().length-1]);
+  await tentarFerramenta(q);     // dado real primeiro, quando houver
+  await gerar();
+}
+async function gerar(){
+  if(!state.ep || !state.model){
+    append({role:"assistant",content:
+      "Preciso de um servidor de modelo.\n\nAbra **config → Servidor** e escolha um (Ollama, LM Studio, llama.cpp…). "+
+      "Enquanto isso, as ferramentas de dados funcionam sem ele — tente *clima em São Paulo* ou *bitcoin*.",
+      at:Date.now()});
+    rolar(); return;
+  }
+  const hist = msgs().filter(m=>!m.ferramenta).map(m=>({role:m.role,content:m.content}));
+  if(state.system) hist.unshift({role:"system",content:state.system});
+
+  const bub = append({role:"assistant",content:"",at:Date.now()});
+  bub.innerHTML = '<div class="thinking"><i></i><i></i><i></i></div>';
+  rolar();
+
+  ctl=new AbortController();
+  $("#dot").className="dot wait";
+  let acc="", t0=performance.now(), toks=0, pintado=false;
+
+  const onTok=s=>{
+    acc+=s; toks++;
+    if(!pintado){ bub.innerHTML=""; pintado=true; }
+    bub.innerHTML = md(acc) + '<span class="caret"></span>';
+    if(toks%4===0) rolar();
+  };
+  try{
+    if(state.kind==="ollama"){
+      await streamOllama(state.ep+"/api/chat", {
+        model:state.model, messages:hist, stream:true,
+        options:{temperature:state.p.temperature, top_p:state.p.top_p,
+                 top_k:state.p.top_k, repeat_penalty:state.p.repeat_penalty,
+                 num_ctx:state.p.num_ctx}
+      }, onTok, ctl.signal);
+    } else {
+      await streamOpenAI(state.ep+"/v1/chat/completions", {
+        model:state.model, messages:hist, stream:true,
+        temperature:state.p.temperature, top_p:state.p.top_p
+      }, onTok, ctl.signal);
+    }
+    const dt=performance.now()-t0;
+    bub.innerHTML=md(acc);
+    const meta=document.createElement("div");
+    meta.className="meta";
+    const cp=document.createElement("button"); cp.className="act"; cp.textContent="copiar";
+    cp.onclick=()=>navigator.clipboard?.writeText(acc).then(()=>toast("copiado"),()=>toast("sem permissão"));
+    meta.appendChild(cp);
+    const st=document.createElement("span");
+    st.textContent=`${toks} tok · ${(dt/1000).toFixed(1)}s · ${(toks/(dt/1000)).toFixed(1)}/s`;
+    meta.appendChild(st);
+    bub.after(meta);
+    msgs().push({role:"assistant",content:acc,at:Date.now(),ms:dt,tok:toks}); save();
+    $("#dot").className="dot live";
+  }catch(e){
+    if(e.name==="AbortError"){
+      bub.innerHTML=md(acc)+'<div class="meta">interrompido</div>';
+      if(acc) msgs().push({role:"assistant",content:acc,at:Date.now()});
+    } else {
+      bub.innerHTML='<span style="color:var(--err)">'+esc(e.message)+'</span>';
+    }
+    save(); $("#dot").className="dot";
+  }finally{ ctl=null; }
+}
+$("#send").onclick=enviar;
+txt.addEventListener("input",sync);
+txt.addEventListener("keydown",e=>{
+  if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); enviar(); }
+});
+
+/* ------------------------------------------------------------ ferramentas
+   Dados reais antes de palpite: quando a pergunta casa, busca na fonte.
+   Sem chave, sem cadastro. */
+const FERR = [
+  {id:"meteo", re:/(clima|tempo|previs[aã]o|temperatura)/i,
+   pega:t=>(t.match(/(?:em|de|para)\s+([^?.!]+)$/i)||[,"São Paulo"])[1].trim(),
+   run:async q=>{
+     const g=await jget("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(q)+"&count=1&language=pt");
+     if(!g.results?.length) throw new Error("cidade não encontrada");
+     const p=g.results[0];
+     const w=await jget(`https://api.open-meteo.com/v1/forecast?latitude=${p.latitude}&longitude=${p.longitude}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=4`);
+     const C={0:"limpo",1:"quase limpo",2:"parcialmente nublado",3:"nublado",45:"neblina",48:"neblina",51:"garoa",53:"chuva fraca",55:"chuva",61:"chuva fraca",63:"chuva",65:"chuva forte",80:"pancadas",81:"pancadas",82:"pancadas fortes",95:"tempestade"};
+     return `**${p.name}** — ${w.current.temperature_2m}°C (sensação ${w.current.apparent_temperature}°C), ${C[w.current.weather_code]||"—"}\n`+
+       `Umidade ${w.current.relative_humidity_2m}% · vento ${w.current.wind_speed_10m} km/h\n\n`+
+       w.daily.time.map((d,i)=>`• ${d}: ${w.daily.temperature_2m_min[i]}° → ${w.daily.temperature_2m_max[i]}°`).join("\n");
+   }},
+  {id:"crypto", re:/(bitcoin|btc|ethereum|eth|solana|sol|criptomoeda)\b/i,
+   pega:t=>({bitcoin:"bitcoin",btc:"bitcoin",ethereum:"ethereum",eth:"ethereum",
+             solana:"solana",sol:"solana"})[(t.toLowerCase().match(/\b(bitcoin|btc|ethereum|eth|solana|sol)\b/)||[,"bitcoin"])[1]],
+   run:async id=>{
+     const r=await jget(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd,brl&include_24hr_change=true`);
+     const d=r[id]; if(!d) throw new Error("não encontrado");
+     return `**${id}** — US$ ${d.usd.toLocaleString("en-US")} · R$ ${(d.brl||0).toLocaleString("pt-BR")}\n`+
+       `24h: ${d.usd_24h_change>=0?"▲":"▼"} ${Math.abs(d.usd_24h_change).toFixed(2)}%`;
+   }},
+  {id:"fx", re:/(d[oó]lar|cota[cç][aã]o|c[aâ]mbio|euro)/i,
+   pega:()=>null,
+   run:async()=>{
+     const r=await jget("https://api.frankfurter.app/latest?from=USD&to=BRL,EUR");
+     return `**USD → BRL** ${r.rates.BRL}\n**USD → EUR** ${r.rates.EUR}\n_em ${r.date}_`;
+   }},
+  {id:"wiki", re:/(wikip[eé]dia|quem foi|o que [eé])\b/i,
+   pega:t=>t.replace(/^\s*(wikip[eé]dia|quem foi|o que [eé])\s*/i,"").replace(/[?.!]$/,"").trim(),
+   run:async q=>{
+     const r=await jget("https://pt.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(q));
+     return `**${r.title}**\n\n${r.extract}\n\n[ler mais](${r.content_urls.desktop.page})`;
+   }},
+  {id:"hn", re:/(hacker ?news|not[ií]cias de tech|tech news)/i,
+   pega:()=>null,
+   run:async()=>{
+     const ids=await jget("https://hacker-news.firebaseio.com/v0/topstories.json");
+     const it=await Promise.all(ids.slice(0,8).map(i=>jget("https://hacker-news.firebaseio.com/v0/item/"+i+".json",6000)));
+     return it.filter(Boolean).map((s,i)=>`${i+1}. **${s.title}** — ${s.score} pts\n   [link](${s.url||"https://news.ycombinator.com/item?id="+s.id})`).join("\n");
+   }},
+];
+async function jget(url, ms=9000){
+  const c=new AbortController(); const t=setTimeout(()=>c.abort(), ms);
+  try{
+    const r=await fetch(url,{signal:c.signal,headers:{Accept:"application/json"}});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    return await r.json();
+  }finally{ clearTimeout(t); }
+}
+// chamado antes do modelo: se houver dado real, usa
+async function tentarFerramenta(q){
+  for(const f of FERR){
+    if(!f.re.test(q)) continue;
+    const bub=append({role:"assistant",content:"",at:Date.now(),ferramenta:true});
+    bub.innerHTML='<div class="thinking"><i></i><i></i><i></i></div>';
+    try{
+      const r=await f.run(f.pega(q));
+      bub.innerHTML=md(r);
+      msgs().push({role:"system",content:"[dados reais] "+r, ferramenta:true, at:Date.now()});
+      return true;
+    }catch(e){
+      bub.remove(); bub.closest(".row")?.remove();
+      return false;
+    }
+  }
+  return false;
+}
+
+/* ------------------------------------------------------------ painel */
+const PRESETS=[
+  {id:"ollama", nm:"Ollama", base:"http://localhost:11434", kind:"ollama", probe:"/api/tags"},
+  {id:"lmstudio", nm:"LM Studio", base:"http://localhost:1234", kind:"openai", probe:"/v1/models"},
+  {id:"llamacpp", nm:"llama.cpp", base:"http://localhost:8080", kind:"openai", probe:"/v1/models"},
+  {id:"kobold", nm:"KoboldCpp", base:"http://localhost:5001", kind:"openai", probe:"/v1/models"},
+  {id:"webui", nm:"text-gen-webui", base:"http://localhost:5000", kind:"openai", probe:"/v1/models"},
+  {id:"vllm", nm:"vLLM", base:"http://localhost:8000", kind:"openai", probe:"/v1/models"},
+];
+function abrirPainel(){ $("#scrim").classList.add("on"); $("#panel").classList.add("on"); renderPainel(); }
+function fecharPainel(){ $("#scrim").classList.remove("on"); $("#panel").classList.remove("on"); }
+$("#bMenu").onclick=abrirPainel;
+$("#scrim").onclick=fecharPainel;
+$("#bNew").onclick=()=>{ state.convs.push([]); state.conv=state.convs.length-1; save(); renderAll(); toast("nova conversa"); };
+
+function renderPainel(){
+  const p=$("#pbody");
+  p.innerHTML=
+   `<div class="sec">
+      <h3>Servidor</h3>
+      <div id="eps"></div>
+      <div class="field" style="margin-top:10px">
+        <label>Endereço manual</label>
+        <div class="rowl">
+          <input type="text" id="custom" placeholder="http://192.168.0.10:1234" value="${esc(state.ep)}">
+          <button class="btn sm" id="usar" style="flex:none;width:auto">usar</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Modelo</label>
+        <select id="sel"><option value="">— escolha —</option></select>
+      </div>
+      <p class="hint">O navegador pode bloquear localhost por CORS. No Ollama: <code>OLLAMA_ORIGINS=* ollama serve</code></p>
+    </div>
+
+    <div class="sec">
+      <h3>Personalidade</h3>
+      <div class="field">
+        <label>Instrução de sistema</label>
+        <textarea id="sys" placeholder="vazio = sem persona imposta">${esc(state.system)}</textarea>
+        <p class="hint">É o seu modelo, na sua máquina: este texto é inteiramente seu.</p>
+      </div>
+      <div>
+        <button class="tag" data-s="">neutro</button>
+        <button class="tag" data-s="Responda em português, de forma direta e sem rodeios.">direto</button>
+        <button class="tag" data-s="Você é um programador sênior. Mostre código completo e explique as decisões.">programador</button>
+        <button class="tag" data-s="Você é um professor paciente. Explique passo a passo, com exemplos.">professor</button>
+        <button class="tag" data-s="Você é um editor rigoroso. Aponte problemas e reescreva melhor.">editor</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h3>Geração</h3>
+      <div class="field">
+        <label>Temperatura <span class="dimmer mono" id="vT"></span></label>
+        <input type="range" id="temp" min="0" max="2" step=".05">
+      </div>
+      <div class="field">
+        <label>top_p <span class="dimmer mono" id="vP"></span></label>
+        <input type="range" id="topp" min="0" max="1" step=".05">
+      </div>
+      <div class="field">
+        <label>top_k <span class="dimmer mono" id="vK"></span></label>
+        <input type="range" id="topk" min="0" max="200" step="1">
+      </div>
+      <div class="field">
+        <label>repetição <span class="dimmer mono" id="vR"></span></label>
+        <input type="range" id="rep" min="1" max="2" step=".05">
+      </div>
+      <div class="field">
+        <label>contexto <span class="dimmer mono" id="vC"></span></label>
+        <input type="range" id="ctx" min="512" max="32768" step="512">
+      </div>
+    </div>
+
+    <div class="sec">
+      <h3>Conversas</h3>
+      <div id="convs"></div>
+      <div class="rowl" style="margin-top:10px">
+        <button class="btn" id="exp">exportar</button>
+        <button class="btn" id="wipe">apagar</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h3>Estado</h3>
+      <div class="card">
+        <div class="kv"><span>servidor</span><b class="mono">${esc(state.ep||"—")}</b></div>
+        <div class="kv"><span>protocolo</span><b>${esc(state.kind)}</b></div>
+        <div class="kv"><span>modelo</span><b class="mono">${esc(state.model||"—")}</b></div>
+        <div class="kv"><span>conversas</span><b>${state.convs.length}</b></div>
+        <div class="kv"><span>mensagens</span><b>${msgs().length}</b></div>
+      </div>
+      <p class="hint">Nada sai deste aparelho, exceto para o endereço que você configurou.</p>
+    </div>`;
+
+  const box=$("#eps");
+  PRESETS.forEach(pr=>{
+    const d=document.createElement("div"); d.className="ep"+(state.ep===pr.base?" on":"");
+    d.innerHTML=`<div class="nm">${esc(pr.nm)}<br><span class="hint mono">${esc(pr.base)}</span></div><div class="st">testar</div>`;
+    d.onclick=async()=>{
+      const st=d.querySelector(".st"); st.textContent="…";
+      const r=await ping(pr.base, pr.probe);
+      if(r.ok){
+        state.ep=pr.base; state.kind=pr.kind; save();
+        st.textContent="ok"; st.className="st ok";
+        await popular(); toast(pr.nm+" conectado"); renderPainel(); atualizar();
+      } else { st.textContent=r.code||"x"; st.className="st no"; toast("sem resposta"); }
+    };
+    box.appendChild(d);
+  });
+  $("#usar").onclick=async()=>{
+    const v=$("#custom").value.trim().replace(/\/+$/,"");
+    if(!v) return toast("cole um endereço");
+    const a=await ping(v,"/v1/models"), b=await ping(v,"/api/tags");
+    if(!a.ok && !b.ok) return toast("sem resposta");
+    state.ep=v; state.kind = b.ok && !a.ok ? "ollama":"openai";
+    save(); await popular(); renderPainel(); atualizar(); toast("conectado");
+  };
+  $("#sel").onchange=e=>{ state.model=e.target.value; save(); atualizar(); };
+  $("#sys").oninput=e=>{ state.system=e.target.value; save(); };
+  p.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{
+    state.system=b.dataset.s; save(); $("#sys").value=state.system; toast("personalidade definida");
+  });
+
+  const P=state.p;
+  const lig=(id,vid,campo,fmt)=>{
+    const el=$("#"+id), v=$("#"+vid);
+    el.value=P[campo]; v.textContent=fmt?fmt(P[campo]):P[campo];
+    el.oninput=()=>{ P[campo]=parseFloat(el.value);
+      v.textContent=fmt?fmt(P[campo]):P[campo]; save(); };
+  };
+  lig("temp","vT","temperature",x=>x.toFixed(2));
+  lig("topp","vP","top_p",x=>x.toFixed(2));
+  lig("topk","vK","top_k");
+  lig("rep","vR","repeat_penalty",x=>x.toFixed(2));
+  lig("ctx","vC","num_ctx");
+
+  const cv=$("#convs");
+  state.convs.forEach((c,i)=>{
+    const d=document.createElement("div"); d.className="ep"+(i===state.conv?" on":"");
+    d.innerHTML=`<div class="nm">Conversa ${i+1}<br><span class="hint">${c.length} mensagens</span></div>`;
+    d.onclick=()=>{ state.conv=i; save(); renderAll(); fecharPainel(); };
+    cv.appendChild(d);
+  });
+  $("#exp").onclick=()=>{
+    const b=new Blob([JSON.stringify(state.convs,null,2)],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(b);
+    a.download="lumen-"+new Date().toISOString().slice(0,10)+".json";
+    a.click(); URL.revokeObjectURL(a.href);
+  };
+  $("#wipe").onclick=()=>{ if(confirm("Apagar tudo?")){ localStorage.removeItem(LS); location.reload(); } };
+
+  popular();
+}
+async function popular(){
+  const sel=$("#sel"); if(!sel) return;
+  const ms=await listarModelos();
+  sel.innerHTML='<option value="">— escolha —</option>'+ms.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("");
+  if(state.model && ms.includes(state.model)) sel.value=state.model;
+  else if(ms.length){ state.model=ms[0]; sel.value=ms[0]; save(); }
+}
+function atualizar(){
+  $("#sub").textContent = state.model || "conversa";
+  const d=$("#dot");
+  d.className = "dot";
+  if(state.ep && state.model){
+    ping(state.ep, state.kind==="ollama"?"/api/tags":"/v1/models",3000)
+      .then(r=>{ d.className="dot"+(r.ok?" live":""); });
+  }
+}
+
+/* ------------------------------------------------------------ init */
+renderAll(); atualizar(); sync();
+window.Lumen={state,md,esc,streamOpenAI,streamOllama,ping,PRESETS,FERR,append,save};
+</script>
+</body>
+</html>
